@@ -9,3 +9,4 @@ namespace BooksCatalogueAPI.Models
         public string ThumbnailContainer { get; set; }
     }
 }
+ 
