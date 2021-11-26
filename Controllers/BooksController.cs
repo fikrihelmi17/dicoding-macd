@@ -13,14 +13,17 @@ namespace BooksCatalogue.Controllers
 {
     public class BooksController : Controller
     {
-        // private string apiEndpoint = "https://bookscatalogueapi-dicoding.azurewebsites.net/api/books/";
-        private string apiEndpoint = "https://localhost:8000/api/books/";
+        private string apiEndpoint = "https://books-catalogue-backend.azurewebsites.net/api/books";
+        //private string apiEndpoint = "https://localhost:8000/api/books/";
+
         private readonly HttpClient _client;
+
+        HttpClientHandler clientHandler = new HttpClientHandler();
         public BooksController()
         {
             // Use this client handler to bypass ssl policy errors
-            // clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
-            _client = new HttpClient();
+            clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
+            _client = new HttpClient(clientHandler);
         }
 
         // GET: Books
