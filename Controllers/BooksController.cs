@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BooksCatalogueAPI.Data;
 using BooksCatalogueAPI.Models;
+using System.IO;
+using Microsoft.Extensions.Options;
+using BooksCatalogueAPI.Helpers;
 
 namespace BooksCatalogueAPI.Controllers
 {
