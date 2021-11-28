@@ -52,6 +52,7 @@ namespace BooksCatalogue.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddReview([Bind("Id,BookId,ReviewerName,Rating,Comment")] Review review)
         {
+                //HttpClient client = new HttpClient(clientHa)
                 MultipartFormDataContent content = new MultipartFormDataContent();
 
                 content.Add(new StringContent(review.BookId.ToString()), "bookId");
@@ -59,7 +60,7 @@ namespace BooksCatalogue.Controllers
                 content.Add(new StringContent(review.Rating.ToString()), "rating");
                 content.Add(new StringContent(review.Comment), "comment");
 
-                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, apiEndpoint + "reviews");
+                HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, apiEndpoint + "review/");
                 request.Content = content;
                 HttpResponseMessage response = await _client.SendAsync(request);
 
@@ -69,7 +70,7 @@ namespace BooksCatalogue.Controllers
                     case HttpStatusCode.NoContent:
                     case HttpStatusCode.Created:
                         int bookids = review.BookId;
-                        return RedirectToAction(nameof(Index)); //return Redirect(baseUrl + bookids);
+                        return Redirect(baseUrl + bookids);
                     default:
                         return ErrorAction("Error. Status code = " + response.StatusCode + "; " + response.ReasonPhrase);
                 }
