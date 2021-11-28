@@ -88,18 +88,19 @@ namespace BooksCatalogueAPI.Controllers
 
         // DELETE: api/Review/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Review>> DeleteReview(int id)
+        //public async Task<ActionResult<Review>> DeleteReview(int id)
+        public async Task<ActionResult> DeleteReview(int id)
         {
-            var review = await _context.Review.FindAsync(id);
+            var review = await _context.Review.Where(e => e.BookId == id).ToListAsync(); //FindAsync(id);
             if (review == null)
             {
                 return NotFound();
             }
 
-            _context.Review.Remove(review);
+            _context.Review.RemoveRange(_context.Review.Where(c => c.BookId == id)); //Remove(review);
             await _context.SaveChangesAsync();
 
-            return review;
+            return NoContent();
         }
 
         private bool ReviewExists(int id)
