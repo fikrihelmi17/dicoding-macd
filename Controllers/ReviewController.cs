@@ -38,7 +38,7 @@ namespace BooksCatalogue.Controllers
                     var book = JsonSerializer.Deserialize<Book>(responseString);
 
                     ViewData["BookId"] = bookId;
-                    return View("Add");
+                    return View("AddReview");
                 case HttpStatusCode.NotFound:
                     return NotFound();
                 default:
