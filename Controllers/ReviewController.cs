@@ -73,11 +73,6 @@ namespace BooksCatalogue.Controllers
                     default:
                         return ErrorAction("Error. Status code = " + response.StatusCode + "; " + response.ReasonPhrase);
                 }
-            }
-            else 
-            {
-                return ErrorAction("Error. Status code = " + (new UnsupportedMediaTypeResult().StatusCode) + "; File is not an image.");
-            }
         }
 
         private ActionResult ErrorAction(string message)
