@@ -76,6 +76,51 @@ namespace BooksCatalogue.Controllers
                 }
         }
 
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiEndpoint + "review/" + id);
+
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            switch(response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    string responseString = await response.Content.ReadAsStringAsync();
+                    var book = JsonSerializer.Deserialize<Review>(responseString);
+
+                    
+                    return View(book);
+                default:
+                    return ErrorAction("Error. Status code = " + response.StatusCode + ": " + response.ReasonPhrase);
+            }
+        }
+
+        [HttpPost, ActionName("DeleteReview")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+        
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, apiEndpoint + "review/" + id);
+            
+            HttpResponseMessage response = await _client.SendAsync(request);
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                case HttpStatusCode.NoContent:
+                    return Redirect("https://books-catalogue-frontend.azurewebsites.net/");
+                case HttpStatusCode.Unauthorized:
+                    return ErrorAction("Please sign in again. " + response.ReasonPhrase);
+                default:
+                    return ErrorAction("Error. Status code = " + response.StatusCode );
+            }
+        }
+
         private ActionResult ErrorAction(string message)
         {
             return new RedirectResult("/Home/Error?message=" + message);
