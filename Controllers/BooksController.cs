@@ -15,6 +15,7 @@ namespace BooksCatalogue.Controllers
     {
         private string apiEndpoint = "https://books-catalogue-backend.azurewebsites.net/api/books/";
         //private string apiEndpoint = "https://localhost:8000/api/books/";
+        private string reviewEndpoint = "https://books-catalogue-backend.azurewebsites.net/api/review/";
 
         private readonly HttpClient _client;
 
@@ -204,20 +205,40 @@ namespace BooksCatalogue.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, apiEndpoint + id);
+            HttpRequestMessage deleteReviewRequest = new HttpRequestMessage(HttpMethod.Delete, reviewEndpoint + id);
+            //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, apiEndpoint + id);
+            HttpResponseMessage deleteReviewResponse = await _client.SendAsync(deleteReviewRequest);
+            //HttpResponseMessage response = await _client.SendAsync(request);
 
-            HttpResponseMessage response = await _client.SendAsync(request);
-
-            switch (response.StatusCode)
+            if(deleteReviewResponse.StatusCode == HttpStatusCode.NoContent || deleteReviewResponse.StatusCode == HttpStatusCode.NotFound) 
             {
-                case HttpStatusCode.OK:
-                case HttpStatusCode.NoContent:
-                    return RedirectToAction(nameof(Index));
-                case HttpStatusCode.Unauthorized:
-                    return ErrorAction("Please sign in again. " + response.ReasonPhrase);
-                default:
-                    return ErrorAction("Error. Status code = " + response.StatusCode);
+                HttpRequestMessage deleteBookRequest = new HttpRequestMessage(HttpMethod.Delete, apiEndpoint + id);
+                HttpResponseMessage deleteBookResponse = await _client.SendAsync(deleteBookRequest);
+
+                switch(deleteBookResponse.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                    case HttpStatusCode.NoContent:
+                        return RedirectToAction(nameof(Index));
+                    case HttpStatusCode.Unauthorized:
+                        return ErrorAction("Please sign in again. " + deleteBookResponse.ReasonPhrase);
+                    default:
+                        return ErrorAction("Error. Status code = " + deleteBookResponse.StatusCode);
+                }
+            } else {
+                return ErrorAction("Error. Status code = " + deleteReviewResponse.StatusCode);
             }
+
+            // switch (response.StatusCode)
+            // {
+            //     case HttpStatusCode.OK:
+            //     case HttpStatusCode.NoContent:
+            //         return RedirectToAction(nameof(Index));
+            //     case HttpStatusCode.Unauthorized:
+            //         return ErrorAction("Please sign in again. " + response.ReasonPhrase);
+            //     default:
+            //         return ErrorAction(ViewBag.message = String.Format("Unable Delete"));
+            // }
         }
 
         private bool IsImage(IFormFile file)
