@@ -154,7 +154,8 @@ namespace BooksCatalogue.Controllers
                     new KeyValuePair<string, string>("title", book.Title),
                     new KeyValuePair<string, string>("author", book.Author),
                     new KeyValuePair<string, string>("synopsis", book.Synopsis),
-                    new KeyValuePair<string, string>("releaseYear", book.ReleaseYear.ToString())
+                    new KeyValuePair<string, string>("releaseYear", book.ReleaseYear.ToString()),
+                    new KeyValuePair<string, string>("coverURL", book.CoverURL)
                 };
 
                 HttpContent content = new FormUrlEncodedContent(httpContent);
