@@ -8,6 +8,9 @@ using System.Net.Http;
 using System.Net;
 using System.Text.Json;
 using System;
+using Microsoft.Extensions.Options;
+using Microsoft.Azure.Search;
+using Microsoft.Azure.Search.Models;
 
 namespace BooksCatalogue.Controllers
 {
@@ -18,13 +21,15 @@ namespace BooksCatalogue.Controllers
         private string reviewEndpoint = "https://books-catalogue-backend.azurewebsites.net/api/review/";
 
         private readonly HttpClient _client;
+        private readonly AzureSearchService searchOptions;
 
         HttpClientHandler clientHandler = new HttpClientHandler();
-        public BooksController()
+        public BooksController(IOptions<AzureSearchService> _searchOptions)
         {
             // Use this client handler to bypass ssl policy errors
             clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
             _client = new HttpClient(clientHandler);
+            searchOptions = _searchOptions.Value;
         }
 
         // GET: Books
@@ -256,6 +261,46 @@ namespace BooksCatalogue.Controllers
         private ActionResult ErrorAction(string message)
         {
             return new RedirectResult("/Home/Error?message=" + message);
+        }
+
+        public IActionResult Search()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> Search(SearchData model)
+        {
+            try
+            {
+                if (model.searchText == null)
+                {
+                    model.searchText = "";
+                }
+        
+                await RunQueryAsync(model);
+            }
+            catch (System.Exception ex)
+            {
+                return ErrorAction(ex.Message);
+            }
+            return View(model);
+        }
+        
+        private async Task<ActionResult> RunQueryAsync(SearchData model)
+        {
+            var searchClient = new SearchServiceClient(searchOptions.SearchServiceName, new SearchCredentials(searchOptions.SearchServiceQueryApiKey));
+            var indexClient = searchClient.Indexes.GetClient(searchOptions.SearchServiceIndex);
+        
+            var parameters = new SearchParameters
+            {
+                // Parameter berisi field yang ingin ditampilkan pada hasil pencarian
+                Select = new[] { "Id", "Title", "Author", "CoverURL"}
+            };
+        
+            model.resultList = await indexClient.Documents.SearchAsync<Book>(model.searchText, parameters);
+        
+            return View("Search", model);
         }
     }
 }
