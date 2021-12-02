@@ -31,6 +31,7 @@ namespace BooksCatalogueAPI
             services.AddControllers();
             services.AddDbContext<MyDatabaseContext>(options => options.UseSqlServer(Configuration.GetConnectionString("MyDbConnection")));
             services.Configure<AzureStorageConfig>(Configuration.GetSection("AzureStorageConfig"));
+            services.AddSwaggerDocument();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,6 +42,8 @@ namespace BooksCatalogueAPI
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
             app.UseHttpsRedirection();
 
             app.UseRouting();
